@@ -7,6 +7,7 @@ import LoginComponent from './components/login'
 import UserComponent from './components/user'
 import NewBlogComponent from './components/newBlogs'
 import loginService from './services/login'
+import JiraComponent from './components/jiraClient'
 const utils = require('./utils/utils.js')
 
 class App extends React.Component {
@@ -217,6 +218,9 @@ class App extends React.Component {
         </div>
         <div style={this.state.showWhenLoggedIn}>
           <NewBlogComponent token={this.state.token} counter={this.state.counter} sendBlog={this.sendBlog}/>
+        </div>
+        <div style={this.state.showWhenLoggedIn}>
+            <JiraComponent token={this.state.token} />
         </div>
       </div>
       )
