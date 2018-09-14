@@ -6,7 +6,6 @@ const config = require('../utils/config')
 usersRouter.get('/', async (request, response) => {
   try {
     const users = await User.find({})
-    .populate('blogs')
     response.json(users.map(user => User.format(user)))
   }
   catch (err) {

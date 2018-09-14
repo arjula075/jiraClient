@@ -4,10 +4,16 @@ if (process.env.NODE_ENV !== 'production') {
 
 let port = process.env.PORT
 let mongoUrl = process.env.MONGO_DB
+let jiraUser = process.env.JIRA_USER
+let jiraPsw = process.env.JIRA_PSW
+let jiraURL = process.env.JIRA_URL
 
 if (process.env.NODE_ENV === 'test') {
   port = process.env.TEST_PORT
   mongoUrl = process.env.TEST_MONGO_DB
+  jiraUser = process.env.TEST_JIRA_USER
+  jiraPsw = process.env.TEST_JIRA_PSW
+  jiraURL = process.env.TEST_JIRA_URL
 }
 
 const log = (file, text) => {
@@ -15,14 +21,17 @@ const log = (file, text) => {
 
   var stream = fs.createWriteStream("./" + file + ".txt");
   stream.once('open', function(fd) {
-  stream.write(text);
-  stream.end();
-});
+    stream.write(text);
+    stream.end();
+  })
 }
 
 
 module.exports = {
   mongoUrl,
   port,
-  log
+  log,
+  jiraUser,
+  jiraPsw,
+  jiraURL
 }

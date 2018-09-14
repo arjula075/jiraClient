@@ -1,13 +1,11 @@
 // No, 5.5 tulikin tehtyä heti kärkeen
 
 import React from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
 import LoginComponent from './components/login'
-import UserComponent from './components/user'
-import NewBlogComponent from './components/newBlogs'
 import loginService from './services/login'
 import JiraComponent from './components/jiraClient'
+import UserComponent from './components/user'
+import jiraService from './services/jiras'
 const utils = require('./utils/utils.js')
 
 class App extends React.Component {
@@ -18,7 +16,6 @@ class App extends React.Component {
       const cachedUser = utils.getUserFromMemory()
       console.log('cachedUser', cachedUser);
       this.state = {
-          blogs: [],
           username: '',
           password: '',
           user: cachedUser,
@@ -29,14 +26,11 @@ class App extends React.Component {
           fetchedPassword: cachedUser ? cachedUser.password : null,
         }
       this.handleLoginResult = this.handleLoginResult.bind(this)
-      this.sendBlog = this.sendBlog.bind(this)
       this.setNotification = this.setNotification.bind(this)
       this.clearmessages = this.clearmessages.bind(this)
-      this.successFullPost = this.successFullPost.bind(this)
       this.loginFromCache = this.loginFromCache.bind(this)
       this.toggleVisibility = this.toggleVisibility.bind(this)
-      this.likePressed = this.likePressed.bind(this)
-      this.deleteBlog = this.deleteBlog.bind(this)
+      this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
     }
     catch (e) {
       console.log(e);
@@ -44,8 +38,17 @@ class App extends React.Component {
 
   }
 
+jiraButtonClicked = async(e) => {
+    e.preventDefault()
+    console.log('jira button clicked in app');
+    console.log('this state in app jira button', this.state);
+    jiraService.authenticate(this.state.token)
+    await jiraService.authenticate(this.state.token)
+  }
+
   toggleVisibility = (id) => {
     console.log('id is vis', id)
+    /**
     const pivotBlogs = this.state.blogs
     const index = pivotBlogs.findIndex(blog => blog._id == id)
     if (index > -1) {
@@ -54,35 +57,15 @@ class App extends React.Component {
     this.setState({
       blogs: pivotBlogs
     })
+    */
   }
 
-  likePressed = async(blog) => {
-    console.log('like pressed', blog)
-    blog.visibility = undefined
-    blog.likes = blog.likes + 1
-    await blogService.updateBlog(blog, this.state.token)
-    await this.successFullPost()
-    this.toggleVisibility(blog._id)
-    this.setNotification('Yeah, new like')
-  }
 
-  deleteBlog = async(blog) => {
-    console.log('delete blog in app', blog)
-    await blogService.deleteBlog(blog, this.state.token)
-    this.setNotification('blog ' + blog.title + ' was deleted')
-    this.successFullPost()
 
-  }
 
   componentDidMount = async() => {
     if (this.state.user) {
       await this.loginFromCache(this.state.user)
-      const  blogs = await blogService.getAll(this.state.token)
-      blogs.sort((a, b) => b.likes - a.likes)
-      for (let i = 0; i < blogs.length; i++) {
-        blogs[i].visibility = false
-      }
-      this.setState({ blogs })
     }
   }
 
@@ -99,31 +82,9 @@ class App extends React.Component {
     this.handleLoginResult(result)
   }
 
-  successFullPost = async() => {
-    let blogs = await blogService.getAll(this.state.token)
-    blogs.sort((a, b) => b.likes - a.likes)
-    for (let i = 0; i < blogs.length; i++) {
-      blogs[i].visibility = false
-    }
-    this.setState({ blogs })
-  }
 
-  sendBlog = async(blog) => {
-    const result = await blogService.createBlog(blog, this.state.token)
-    try {
-      let newBlogs = await blogService.getAll(this.state.token)
-      newBlogs.sort((a, b) => b.likes - a.likes)
-      for (let i = 0; i < newBlogs.length; i++) {
-        newBlogs[i].visibility = false
-      }
-      this.setState({blogs: newBlogs})
-      this.setNotification('Good job')
-    }
-    catch (e) {
-      console.log(e)
-      this.setNotification('NA', 'failed')
-    }
-  }
+
+
 
   clearmessages() {
   this.setState({
@@ -149,12 +110,6 @@ class App extends React.Component {
         return
       }
 
-      let blogs = await blogService.getAll(result.token)
-      blogs.sort((a, b) => b.likes - a.likes)
-      for (let i = 0; i < blogs.length; i++) {
-        blogs[i].visibility = false
-      }
-
       this.setState({
           hideWhenLoggedIn: utils.displayNone(),
           showWhenLoggedIn: utils.displayNormal(),
@@ -162,7 +117,6 @@ class App extends React.Component {
           username: '',
           password: '',
           token: 'bearer ' + result.token,
-          blogs: blogs,
           counter: this.state.counter + 1,
         })
     }
@@ -196,7 +150,7 @@ class App extends React.Component {
   render() {
 
     try {
-      //console.log('this.state in render', this.state);
+      console.log('this.state in render', this.state);
       let user = {'username': this.state.username, 'password': this.state.password}
       let userName = undefined
       if (this.state.user) {
@@ -212,15 +166,8 @@ class App extends React.Component {
         <div  style={this.state.showWhenLoggedIn}>
           <UserComponent user={this.state.user} />
         </div>
-        <div>
-          <h2>blogs</h2>
-              <Blog blogs={this.state.blogs} toggleVisibility={this.toggleVisibility} likePressed={this.likePressed} user = {userName} deleteBlog  = {this.deleteBlog}/>
-        </div>
         <div style={this.state.showWhenLoggedIn}>
-          <NewBlogComponent token={this.state.token} counter={this.state.counter} sendBlog={this.sendBlog}/>
-        </div>
-        <div style={this.state.showWhenLoggedIn}>
-            <JiraComponent token={this.state.token} />
+            <JiraComponent jiraButtonClicked={this.jiraButtonClicked}/>
         </div>
       </div>
       )

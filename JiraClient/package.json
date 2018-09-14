@@ -1,7 +1,7 @@
 {
-  "name": "osa4",
+  "name": "JiraClient",
   "version": "1.0.0",
-  "description": "osa4",
+  "description": "to add Jira issues from file",
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node index.js",

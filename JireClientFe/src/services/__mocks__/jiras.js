@@ -1,5 +1,5 @@
 // setting up test data
-const initialBlogs = [
+const initialIssues = [
 	{
 		"title": "Ari's first blog",
 		"author": "Ari Lahti",
@@ -20,10 +20,10 @@ const initialBlogs = [
 	}
 ]
 
-const getAll = (token) => {
-    return Promise.resolve(initialBlogs)
+const authenticate = (token) => {
+    return Promise.resolve(initialIssues)
 }
 
 export default {
-  getAll,
+  authenticate,
 }
