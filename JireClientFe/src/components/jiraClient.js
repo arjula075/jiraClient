@@ -1,4 +1,5 @@
 import React from 'react'
+import jiraService from '../services/jiras'
 
 class JiraComponent extends React.Component {
 
@@ -11,9 +12,11 @@ constructor(props) {
   this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
 }
 
-jiraButtonClicked = (e) => {
+jiraButtonClicked = async(e) => {
   e.preventDefault()
   console.log('jira button clicked');
+  jiraService.authenticate(this.state.token)
+  await jiraService.authenticate(this.state.token)
 }
 
 

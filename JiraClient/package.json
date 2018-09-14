@@ -34,10 +34,11 @@
     "cors": "^2.8.4",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
+    "jira-connector": "^2.8.0",
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.1.2",
     "morgan": "^1.9.0",
-    "npm": "^6.3.0"
+    "npm": "^6.4.1"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
