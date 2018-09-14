@@ -31,6 +31,7 @@ class App extends React.Component {
       this.loginFromCache = this.loginFromCache.bind(this)
       this.toggleVisibility = this.toggleVisibility.bind(this)
       this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
+      this.lineToIssue = this.lineToIssue.bind(this)
     }
     catch (e) {
       console.log(e);
@@ -38,11 +39,20 @@ class App extends React.Component {
 
   }
 
-jiraButtonClicked = async(e) => {
+jiraButtonClicked = async(e, myFile) => {
     e.preventDefault()
-    console.log('jira button clicked in app');
-    console.log('this state in app jira button', this.state);
-    jiraService.authenticate(this.state.token)
+    var fr = new FileReader();
+    fr.onload = function(e) {
+      console.log();
+      const lineArray = e.target.result.split('¤¤')
+      const resultArray = []
+      lineArray.map(line => {
+        console.log(this);
+        resultArray.push(utils.lineToIssue(line))
+      })
+      console.log('e.target.result', resultArray)
+    }
+    fr.readAsText(myFile)
     await jiraService.authenticate(this.state.token)
   }
 

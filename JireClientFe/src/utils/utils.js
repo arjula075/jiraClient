@@ -14,6 +14,40 @@ const setUserToMemory = (user) => {
   window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
 }
 
+const lineToIssue = (line) => {
+  // epic summary description label points
+  const lineArray = line.split(';')
+  const tempObject = {}
+  let issueObject = {}
+  let tempFields = {}
+  if (lineArray[0] !== "") {
+    tempFields = {
+      key: 'ANP',
+      customfield_10002: lineArray[0],
+      summary: lineArray[1],
+      description: lineArray[2],
+      issuetype:
+        {id: 10000},
+      labels: lineArray[3],
+    }
+  }
+  else {
+    tempFields = {
+      key: 'ANP',
+      summary: lineArray[1],
+      description: lineArray[2],
+      issuetype:
+        {id: 10100},
+      customfield_10117 : lineArray[4],
+      labels: lineArray[3],
+    }
+  }
+  tempObject.fields = {}
+  tempObject.fields.project = tempFields
+  return tempObject
+
+}
+
 
 const logOut = () => {
    window.localStorage.removeItem('loggedBlogAppUser')
@@ -47,5 +81,6 @@ module.exports = {
   setUserToMemory,
   displayNone,
   displayNormal,
-  makeAuthString
+  makeAuthString,
+  lineToIssue
 }
