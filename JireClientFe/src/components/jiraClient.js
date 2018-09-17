@@ -20,9 +20,8 @@ handleFileFieldChange = (e) => {
 }
 
 buttonClicked = (e) => {
-  console.log('myfile', this.state.myfile)
-  console.log('typeof myfile', typeof this.state.myfile)
-  this.jiraButtonClicked(e, this.state.myfile)
+  console.log('in jirclient token',  this.state.token);
+  this.jiraButtonClicked(e, this.state.myfile, this.state.token)
 }
 
 
@@ -34,10 +33,12 @@ render() {
   return (
     <div>
       <form>
-        <button type='submit' onClick={this.buttonClicked}>JIRA</button>
-        Select a file: <input
+        <div>
+          Select a file: <input
           type='file'
           onChange={this.handleFileFieldChange}/>
+          <button type='submit' onClick={this.buttonClicked}>UPLOAD FILE</button>
+        </div>
 
       </form>
     </div>

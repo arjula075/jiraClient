@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/arjula075/fullStack3#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "bcrypt": "^3.0.0",
     "cors": "^2.8.4",
     "dotenv": "^6.0.0",

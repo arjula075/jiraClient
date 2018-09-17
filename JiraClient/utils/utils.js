@@ -1,13 +1,20 @@
 
 const jwt = require('jsonwebtoken')
+const config = require('../utils/config')
+
+const createJiraToken = () => {
+  console.log(config.jiraUser + ':' + config.jiraPsw);
+  //return 'Basic ' + Buffer.from(config.jiraUser + ':' + config.jiraToken).toString('base64')
+  return 'Basic ' + config.jiraUser + ':' + config.jiraPsw
+}
 
 const getTokenFrom = (request) => {
 
   try {
     const authorization = request.get('Authorization')
-    console.log('authorization', authorization)
+    //console.log('authorization', authorization)
     if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-      console.log('index to subst', authorization.lastIndexOf('bearer ') + 7)
+      //console.log('index to subst', authorization.lastIndexOf('bearer ') + 7)
       return authorization.substring(authorization.lastIndexOf('bearer ') + 7)
     }
     return null
@@ -48,4 +55,5 @@ const isValidCall = (request) => {
 
 module.exports = {
   isValidCall,
+  createJiraToken
 }

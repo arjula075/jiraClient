@@ -17,37 +17,34 @@ const setUserToMemory = (user) => {
 const lineToIssue = (line) => {
   // epic summary description label points
   const lineArray = line.split(';')
-  const tempObject = {}
-  let issueObject = {}
-  let tempFields = {}
+  const issueObject = {}
+  // setting stroypoints
+  if (lineArray[4] === "") {
+    lineArray[4] = 1
+  }
   if (lineArray[0] !== "") {
-    tempFields = {
-      key: 'ANP',
-      customfield_10002: lineArray[0],
-      summary: lineArray[1],
-      description: lineArray[2],
-      issuetype:
-        {id: 10000},
-      labels: lineArray[3],
-    }
+      issueObject.customfield_10010 =  lineArray[0]
+      issueObject.summary = lineArray[1]
+      issueObject.description = lineArray[2]
+      issueObject.issuetype =
+        {id: '10000'}
+      issueObject.labels = [lineArray[3]]
+      issueObject.customfield_10022 = lineArray[4]
   }
   else {
-    tempFields = {
-      key: 'ANP',
-      summary: lineArray[1],
-      description: lineArray[2],
-      issuetype:
-        {id: 10100},
-      customfield_10117 : lineArray[4],
-      labels: lineArray[3],
-    }
+      issueObject.summary = lineArray[1]
+      issueObject.description = lineArray[2]
+      issueObject.issuetype =
+        {id: '10001'}
+      issueObject.customfield_10022 = lineArray[4]
+      issueObject.labels = [lineArray[3]]
   }
-  tempObject.fields = {}
-  tempObject.fields.project = tempFields
-  return tempObject
+  issueObject.project = {
+    key: 'LC',
+  }
+  return issueObject
 
 }
-
 
 const logOut = () => {
    window.localStorage.removeItem('loggedBlogAppUser')
@@ -66,13 +63,30 @@ const displayNormal = () => {
   }
 }
 
+const createIssueArray = (array) => {
+  console.log('Array in beginning of createIssueArray', array);
+  const resultArray = []
+  let counter = -1
+  for (let i=0; i < array.length; i++) {
+    if (array[i].issuetype.id === '10000') {
+      resultArray.push(array[i])
+      counter++
+      resultArray[counter].issues = []
+    }
+    else {
+      resultArray[counter].issues.push(array[i])
+    }
+  }
+  console.log('resultArray', resultArray);
+  return resultArray
+}
+
 const makeAuthString = (token) => {
   let authString = token
   if (token && !token.toLowerCase().startsWith('bearer ')) {
     authString = 'bearer '.concat(token)
   }
   return authString
-
 }
 
 module.exports = {
@@ -82,5 +96,6 @@ module.exports = {
   displayNone,
   displayNormal,
   makeAuthString,
-  lineToIssue
+  lineToIssue,
+  createIssueArray
 }

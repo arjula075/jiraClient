@@ -23,6 +23,7 @@ class App extends React.Component {
           showWhenLoggedIn: utils.displayNone(),
           token: null,
           counter: 0,
+          issues: null,
           fetchedPassword: cachedUser ? cachedUser.password : null,
         }
       this.handleLoginResult = this.handleLoginResult.bind(this)
@@ -31,7 +32,6 @@ class App extends React.Component {
       this.loginFromCache = this.loginFromCache.bind(this)
       this.toggleVisibility = this.toggleVisibility.bind(this)
       this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
-      this.lineToIssue = this.lineToIssue.bind(this)
     }
     catch (e) {
       console.log(e);
@@ -39,21 +39,34 @@ class App extends React.Component {
 
   }
 
-jiraButtonClicked = async(e, myFile) => {
-    e.preventDefault()
-    var fr = new FileReader();
-    fr.onload = function(e) {
-      console.log();
-      const lineArray = e.target.result.split('¤¤')
-      const resultArray = []
-      lineArray.map(line => {
-        console.log(this);
-        resultArray.push(utils.lineToIssue(line))
-      })
-      console.log('e.target.result', resultArray)
-    }
-    fr.readAsText(myFile)
-    await jiraService.authenticate(this.state.token)
+jiraButtonClicked = async(evt, myFile, token) => {
+    console.log('in jbc token', token);
+    console.log('in jbc token', this.state.token);
+    evt.preventDefault()
+
+    var reader = new FileReader();
+    reader.token = this.state.token
+
+    reader.onload = (function(f) {
+        return function(e) {
+          console.log('in onload', this.token);
+          const lineArray = e.target.result.split('¤¤')
+          const resultArray = []
+          lineArray.map(line => {
+            //console.log(this);
+            resultArray.push(utils.lineToIssue(line))
+          })
+          const resultObjectArray = utils.createIssueArray(resultArray)
+          const result = jiraService.postIssue(this.token, resultObjectArray)
+          console.log('result', result);
+        };
+    })(myFile);
+
+    reader.readAsText(myFile);
+
+    //await jiraService.authenticate(this.state.token)
+    const issue = await jiraService.getIssue(this.state.token, 'LC-4')
+    console.log('issue', issue);
   }
 
   toggleVisibility = (id) => {
@@ -69,9 +82,6 @@ jiraButtonClicked = async(e, myFile) => {
     })
     */
   }
-
-
-
 
   componentDidMount = async() => {
     if (this.state.user) {
@@ -91,10 +101,6 @@ jiraButtonClicked = async(e, myFile) => {
     const result = await loginService.login(cachedUser)
     this.handleLoginResult(result)
   }
-
-
-
-
 
   clearmessages() {
   this.setState({
