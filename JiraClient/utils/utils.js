@@ -1,12 +1,16 @@
 
+const JiraClient = require('jira-connector')
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
 
 const createJiraToken = () => {
-  console.log(config.jiraUser + ':' + config.jiraPsw);
-  //return 'Basic ' + Buffer.from(config.jiraUser + ':' + config.jiraToken).toString('base64')
-  return 'Basic ' + config.jiraUser + ':' + config.jiraPsw
+  console.log(config.jiraUser + ':' + config.jiraToken);
+  console.log('Basic ' + Buffer.from(config.jiraUser + ':' + config.jiraToken).toString('base64'));
+  return Buffer.from(config.jiraUser + ':' + config.jiraToken).toString('base64')
+  //return 'Basic ' + config.jiraUser + ':' + config.jiraPsw
 }
+
+
 
 const getTokenFrom = (request) => {
 
@@ -55,5 +59,6 @@ const isValidCall = (request) => {
 
 module.exports = {
   isValidCall,
-  createJiraToken
+  createJiraToken,
+
 }

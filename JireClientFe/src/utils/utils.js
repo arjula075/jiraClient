@@ -89,6 +89,14 @@ const makeAuthString = (token) => {
   return authString
 }
 
+const makeAuthHeader = (token) => {
+  let authString = token
+  let buff = new Buffer(token)
+  let base64data = buff.toString('base64')
+  authString = "Basic " + base64data
+  return authString
+}
+
 module.exports = {
   getUserFromMemory,
   logOut,
@@ -96,6 +104,7 @@ module.exports = {
   displayNone,
   displayNormal,
   makeAuthString,
+  makeAuthHeader,
   lineToIssue,
   createIssueArray
 }

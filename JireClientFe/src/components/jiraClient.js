@@ -10,6 +10,8 @@ constructor(props) {
   }
   this.jiraButtonClicked = props.jiraButtonClicked
   this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
+  this.dataButtonClicked = props.dataButtonClicked
+  this.dataButtonClicked = this.dataButtonClicked.bind(this)
   this.buttonClicked = this.buttonClicked.bind(this)
   this.handleFileFieldChange = this.handleFileFieldChange.bind(this)
 }
@@ -38,6 +40,9 @@ render() {
           type='file'
           onChange={this.handleFileFieldChange}/>
           <button type='submit' onClick={this.buttonClicked}>UPLOAD FILE</button>
+        </div>
+        <div>
+          <button type='submit' onClick={this.dataButtonClicked}>GET DATA</button>
         </div>
 
       </form>

@@ -9,6 +9,7 @@ const JiraClient = require('jira-connector')
 
 
 jiraRouter.get('/:id', async (request, response) => {
+    console.log('withID');
     validCall = utils.isValidCall(request)
     if (validCall.statuscode !== 200) {
       response.status(validCall.statuscode).json(validCall.status)
@@ -17,11 +18,11 @@ jiraRouter.get('/:id', async (request, response) => {
     const jira = new JiraClient( {
       host: config.jiraURL,
       basic_auth: {
-          username: config.jiraUser,
-          password: config.jiraPsw
+          base64: utils.createJiraToken()
       }
     })
-    const issue = await jira.issue.getIssue({
+
+    const issue = await jira.issue.getChangelog({
       issueKey: request.params.id
     }, function(error, issue) {
       console.log('error', error);
@@ -31,6 +32,7 @@ jiraRouter.get('/:id', async (request, response) => {
 })
 
 jiraRouter.get('/', async (request, response) => {
+    console.log('noID');
     validCall = utils.isValidCall(request)
     if (validCall.statuscode !== 200) {
       response.status(validCall.statuscode).json(validCall.status)
@@ -39,8 +41,7 @@ jiraRouter.get('/', async (request, response) => {
     const jira = new JiraClient( {
       host: config.jiraURL,
       basic_auth: {
-          username: config.jiraUser,
-          password: config.jiraPsw
+          base64: utils.createJiraToken()
       }
     })
     const issue = jira.issue.getIssue({
@@ -73,8 +74,7 @@ const jiraDeleteAll = async(array) => {
   const jira = new JiraClient( {
     host: config.jiraURL,
     basic_auth: {
-        username: config.jiraUser,
-        password: config.jiraPsw
+        base64: utils.createJiraToken()
     }
   })
 
@@ -98,8 +98,7 @@ const jiraGetIssue = async(id) => {
   const jira = new JiraClient( {
     host: config.jiraURL,
     basic_auth: {
-        username: config.jiraUser,
-        password: config.jiraPsw
+        base64: utils.createJiraToken()
     }
   })
   const issue = jira.issue.getIssue({
@@ -115,8 +114,7 @@ const jiraCreateCalls = async(array) => {
   const jira = new JiraClient( {
     host: config.jiraURL,
     basic_auth: {
-        username: config.jiraUser,
-        password: config.jiraPsw
+        base64: utils.createJiraToken()
     }
   })
   try {

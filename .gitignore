@@ -6,3 +6,6 @@ JiraClient/build/static/js/main.1c5ba1cd.js
 JiraClient/build/static/
 node_modules/
 JiraClient/.env
+JiraClient/pivateKey.pcks8
+JiraClient/publicKey.pem
+JireClientFe/.env

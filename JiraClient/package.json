@@ -4,7 +4,7 @@
   "description": "to add Jira issues from file",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node index.js",
+    "start": "cross-env NODE_ENV=development nodemon index.js",
     "watch": "cross-env NODE_ENV=development nodemon index.js",
     "test": "cross-env NODE_ENV=test jest --verbose",
     "lint": "eslint ."
@@ -30,16 +30,16 @@
   },
   "homepage": "https://github.com/arjula075/fullStack3#readme",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "bcrypt": "^3.0.0",
     "cors": "^2.8.4",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
-    "jira-connector": "^2.8.0",
+    "jira-connector": "^2.16.1",
     "jsonwebtoken": "^8.3.0",
-    "mongoose": "^5.1.2",
-    "morgan": "^1.9.0",
-    "npm": "^6.4.1"
+    "mongoose": "^5.8.7",
+    "morgan": "^1.9.1",
+    "npm": "^6.13.6"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",

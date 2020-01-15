@@ -32,6 +32,7 @@ class App extends React.Component {
       this.loginFromCache = this.loginFromCache.bind(this)
       this.toggleVisibility = this.toggleVisibility.bind(this)
       this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
+      this.dataButtonClicked = this.dataButtonClicked.bind(this)
     }
     catch (e) {
       console.log(e);
@@ -68,6 +69,16 @@ jiraButtonClicked = async(evt, myFile, token) => {
     const issue = await jiraService.getIssue(this.state.token, 'LC-4')
     console.log('issue', issue);
   }
+
+  dataButtonClicked = async(evt, myFile, token) => {
+      console.log('in jbc token', token);
+      console.log('in jbc token', this.state.token);
+      evt.preventDefault()
+
+      //await jiraService.authenticate(this.state.token)
+      const issue = await jiraService.getIssue(this.state.token, 'LC-8')
+      console.log('issue', issue);
+    }
 
   toggleVisibility = (id) => {
     console.log('id is vis', id)
@@ -183,7 +194,7 @@ jiraButtonClicked = async(evt, myFile, token) => {
           <UserComponent user={this.state.user} />
         </div>
         <div style={this.state.showWhenLoggedIn}>
-            <JiraComponent jiraButtonClicked={this.jiraButtonClicked}/>
+            <JiraComponent jiraButtonClicked={this.jiraButtonClicked} dataButtonClicked={this.dataButtonClicked}/>
         </div>
       </div>
       )
