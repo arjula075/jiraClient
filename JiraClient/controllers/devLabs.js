@@ -1,6 +1,6 @@
 const axios = require ('axios')
 
-const jiraRouter = require('express').Router()
+const devlabsRouter = require('express').Router()
 const mongoose = require('mongoose')
 const utils = require('../utils/utils')
 const jwt = require('jsonwebtoken')
@@ -8,30 +8,48 @@ const config = require('../utils/config')
 const JiraClient = require('jira-connector')
 
 
-jiraRouter.get('/:id', async (request, response) => {
-    console.log('jira withID');
-    validCall = utils.isValidCall(request)
-    if (validCall.statuscode !== 200) {
-      response.status(validCall.statuscode).json(validCall.status)
-      return
-    }
+devlabsRouter.get('/:id', async (request, response) => {
+    console.log('devlabs withID');
+    //validCall = utils.isValidCall(request)
+    //if (validCall.statuscode !== 200) {
+    //  response.status(validCall.statuscode).json(validCall.status)
+    //  return
+    //}
+
+    let jql_string = 'project = HRTS AND fixVersion !~ "Kieku*" ORDER BY lastViewed DESC'
     const jira = new JiraClient( {
-      host: config.jiraURL,
+      protocol: 'https',
+      strictSSL: false,
+      host: config.jiraDevLabsUrl,
+      port: '8443',
+      apiVersion: '2',
       basic_auth: {
-          base64: utils.createJiraToken()
+          username: config.jiraDevLabsUser.trim(),
+          password: config.jiraDevLabsPsw.trim()
       }
     })
+    console.log('JiraClient:', jira)
 
-    const issue = await jira.issue.getChangelog({
-      issueKey: request.params.id
-    }, function(error, issue) {
-      console.log('error', error);
+    const issue = await jira.search.search({
+      jql: jql_string,
+      maxResults: 3654
+      },
+      function(error, issue) {
+      console.log('error issue', error, issue);
       response.json({issue: issue})
     })
 
+    //const issue = await jira.issue.getIssue({
+    //  issueKey: request.params.id
+    //  },
+    //  function(error, issue) {
+    //  console.log('error issue', error, issue);
+    //  response.json({issue: issue})
+    //})
+
 })
 
-jiraRouter.get('/', async (request, response) => {
+devlabsRouter.get('/', async (request, response) => {
     console.log('noID');
     validCall = utils.isValidCall(request)
     if (validCall.statuscode !== 200) {
@@ -54,7 +72,7 @@ jiraRouter.get('/', async (request, response) => {
     response.json({issue: issue})
 })
 
-jiraRouter.post('/', async (request, response) => {
+devlabsRouter.post('/', async (request, response) => {
   // validating own call
   validCall = utils.isValidCall(request)
   if (validCall.statuscode !== 200) {
@@ -157,6 +175,4 @@ const createIssue = async(issue2, issue3, jira) => {
 
 }
 
-
-
-module.exports = jiraRouter
+module.exports = devlabsRouter

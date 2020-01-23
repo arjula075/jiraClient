@@ -1,6 +1,8 @@
 import axios from 'axios'
 const utils = require('../utils/utils.js')
 const baseUrl = '/api/jira'
+const baseUrlDevLabs = '/api/devlabs'
+const baseUrlAsop = '/api/asop'
 
 const authenticate = async(token) => {
   const authString = utils.makeAuthString(token)
@@ -25,6 +27,36 @@ const getIssue = async(token, id) => {
 
 }
 
+const getDevLabsIssue = async(token, id) => {
+  const authString = utils.makeAuthString(token)
+  const head =  {'headers' :{'Authorization': authString}}
+
+  console.log(baseUrlDevLabs, id,  head)
+  try {
+    const request = axios.get(baseUrlDevLabs + `/${id}`, head)
+    return request.then(response => response.data)
+  }
+  catch(error) {
+    console.log(error)
+  }
+
+}
+
+const getAsopIssue = async(token, id) => {
+  const authString = utils.makeAuthString(token)
+  const head =  {'headers' :{'Authorization': authString}}
+
+  console.log(baseUrlAsop, id,  head)
+  try {
+    const request = axios.get(baseUrlAsop + `/${id}`, head)
+    return request.then(response => response.data)
+  }
+  catch(error) {
+    console.log(error)
+  }
+
+}
+
 const postIssue = async(token, issue) => {
   const authString = utils.makeAuthString(token)
   const head =  {'headers' :{'Authorization': authString}}
@@ -41,4 +73,6 @@ export default {
   authenticate,
   getIssue,
   postIssue,
+  getDevLabsIssue,
+  getAsopIssue
 }

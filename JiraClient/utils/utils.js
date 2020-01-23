@@ -10,7 +10,12 @@ const createJiraToken = () => {
   //return 'Basic ' + config.jiraUser + ':' + config.jiraPsw
 }
 
-
+const createJiraTokenFromPsw = () => {
+  console.log(config.jiraDevLabsUser + ':' + config.jiraDevLabsPsw);
+  console.log('Basic ' + Buffer.from(config.jiraDevLabsUser + ':' + config.jiraDevLabsPsw).toString('base64'));
+  return Buffer.from(config.jiraDevLabsUser + ':' + config.jiraDevLabsPsw).toString('base64')
+  //return 'Basic ' + config.jiraUser + ':' + config.jiraPsw
+}
 
 const getTokenFrom = (request) => {
 
@@ -60,5 +65,5 @@ const isValidCall = (request) => {
 module.exports = {
   isValidCall,
   createJiraToken,
-
+  createJiraTokenFromPsw
 }

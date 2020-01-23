@@ -5,6 +5,8 @@ import LoginComponent from './components/login'
 import loginService from './services/login'
 import JiraComponent from './components/jiraClient'
 import UserComponent from './components/user'
+import DevLabsComponent from './components/devlabs'
+import AsopComponent from './components/asop'
 import jiraService from './services/jiras'
 const utils = require('./utils/utils.js')
 
@@ -33,6 +35,8 @@ class App extends React.Component {
       this.toggleVisibility = this.toggleVisibility.bind(this)
       this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
       this.dataButtonClicked = this.dataButtonClicked.bind(this)
+      this.devlabsButtonClicked = this.devlabsButtonClicked.bind(this)
+      this.asopButtonClicked = this.asopButtonClicked.bind(this)
     }
     catch (e) {
       console.log(e);
@@ -69,6 +73,26 @@ jiraButtonClicked = async(evt, myFile, token) => {
     const issue = await jiraService.getIssue(this.state.token, 'LC-4')
     console.log('issue', issue);
   }
+
+  devlabsButtonClicked = async(evt, myFile, token) => {
+      console.log('in jbc token', token);
+      console.log('in jbc token', this.state.token);
+      evt.preventDefault()
+
+      //await jiraService.authenticate(this.state.token)
+      const issue = await jiraService.getDevLabsIssue(this.state.token, 'SPJ1-102')
+      console.log('issue', issue);
+    }
+
+    asopButtonClicked = async(evt, myFile, token) => {
+        console.log('in jbc token', token);
+        console.log('in jbc token', this.state.token);
+        evt.preventDefault()
+
+        //await jiraService.authenticate(this.state.token)
+        const issue = await jiraService.getAsopIssue(this.state.token, 'IPSLACE-2')
+        console.log('issue', issue);
+      }
 
   dataButtonClicked = async(evt, myFile, token) => {
       console.log('in jbc token', token);
@@ -194,8 +218,14 @@ jiraButtonClicked = async(evt, myFile, token) => {
           <UserComponent user={this.state.user} />
         </div>
         <div style={this.state.showWhenLoggedIn}>
-            <JiraComponent jiraButtonClicked={this.jiraButtonClicked} dataButtonClicked={this.dataButtonClicked}/>
+            <JiraComponent jiraButtonClicked={this.jiraButtonClicked} dataButtonClicked={this.dataButtonClicked} devlabsButtonClicked={this.devlabsButtonClicked}/>
         </div>
+        <div style={this.state.hideWhenLoggedIn}>
+          <DevLabsComponent devlabsButtonClicked={this.devlabsButtonClicked}/>
+        </div >
+        <div style={this.state.hideWhenLoggedIn}>
+          <AsopComponent asopButtonClicked={this.asopButtonClicked}/>
+        </div >
       </div>
       )
     }

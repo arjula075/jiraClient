@@ -12,6 +12,8 @@ constructor(props) {
   this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
   this.dataButtonClicked = props.dataButtonClicked
   this.dataButtonClicked = this.dataButtonClicked.bind(this)
+  this.devlabsButtonClicked = props.devlabsButtonClicked
+  this.devlabsButtonClicked = this.devlabsButtonClicked.bind(this)
   this.buttonClicked = this.buttonClicked.bind(this)
   this.handleFileFieldChange = this.handleFileFieldChange.bind(this)
 }
@@ -43,6 +45,9 @@ render() {
         </div>
         <div>
           <button type='submit' onClick={this.dataButtonClicked}>GET DATA</button>
+        </div>
+        <div>
+          <button type='submit' onClick={this.devlabsButtonClicked}>GET DEVLABS DATA</button>
         </div>
 
       </form>
