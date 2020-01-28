@@ -7,6 +7,7 @@ import JiraComponent from './components/jiraClient'
 import UserComponent from './components/user'
 import DevLabsComponent from './components/devlabs'
 import AsopComponent from './components/asop'
+import IssueComponent from './components/issue'
 import jiraService from './services/jiras'
 const utils = require('./utils/utils.js')
 
@@ -27,6 +28,7 @@ class App extends React.Component {
           counter: 0,
           issues: null,
           fetchedPassword: cachedUser ? cachedUser.password : null,
+          issues: null,
         }
       this.handleLoginResult = this.handleLoginResult.bind(this)
       this.setNotification = this.setNotification.bind(this)
@@ -37,6 +39,7 @@ class App extends React.Component {
       this.dataButtonClicked = this.dataButtonClicked.bind(this)
       this.devlabsButtonClicked = this.devlabsButtonClicked.bind(this)
       this.asopButtonClicked = this.asopButtonClicked.bind(this)
+      this.getChangeLog = this.getChangeLog.bind(this)
     }
     catch (e) {
       console.log(e);
@@ -75,18 +78,26 @@ jiraButtonClicked = async(evt, myFile, token) => {
   }
 
   devlabsButtonClicked = async(evt, myFile, token) => {
-      console.log('in jbc token', token);
-      console.log('in jbc token', this.state.token);
       evt.preventDefault()
 
       //await jiraService.authenticate(this.state.token)
-      const issue = await jiraService.getDevLabsIssue(this.state.token, 'SPJ1-102')
-      console.log('issue', issue);
+      const issue = await jiraService.getAllDevLabsIssues(this.state.token)
+      this.setState({issues: issue.issue.issues})
+
+      // get change history
+      this.state.issues.map(issue => {
+          this.getChangeLog(issue.key)
+        })
+
+    }
+
+    getChangeLog = async(id) => {
+      let changeLog = await jiraService.getDevLabsIssueChangeLog(this.state.token, id)
+      console.log(changeLog);
+
     }
 
     asopButtonClicked = async(evt, myFile, token) => {
-        console.log('in jbc token', token);
-        console.log('in jbc token', this.state.token);
         evt.preventDefault()
 
         //await jiraService.authenticate(this.state.token)
@@ -106,16 +117,17 @@ jiraButtonClicked = async(evt, myFile, token) => {
 
   toggleVisibility = (id) => {
     console.log('id is vis', id)
-    /**
-    const pivotBlogs = this.state.blogs
-    const index = pivotBlogs.findIndex(blog => blog._id == id)
+    const pivotIssues = this.state.issues
+    const index = pivotIssues.findIndex(blog => blog.id == id)
     if (index > -1) {
-      pivotBlogs[index].visibility =  !pivotBlogs[index].visibility
+      if (typeof pivotIssues[index].visibility == 'undefined') {
+        pivotIssues[index].visibility = false
+      }
+      pivotIssues[index].visibility =  !pivotIssues[index].visibility
     }
     this.setState({
-      blogs: pivotBlogs
+      issues: pivotIssues
     })
-    */
   }
 
   componentDidMount = async() => {
@@ -225,6 +237,9 @@ jiraButtonClicked = async(evt, myFile, token) => {
         </div >
         <div style={this.state.hideWhenLoggedIn}>
           <AsopComponent asopButtonClicked={this.asopButtonClicked}/>
+        </div >
+        <div style={this.state.showWhenLoggedIn}>
+          <IssueComponent issues={this.state.issues} toggleVisibility={this.toggleVisibility}/>
         </div >
       </div>
       )

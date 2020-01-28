@@ -12,6 +12,7 @@ let jiraDevLabsUser = process.env.JIRA_DEVLABS_USER
 let jiraDevLabsUrl = process.env.JIRA_DEVLABS_URL
 let jiraDevLabsPsw = process.env.JIRA_DEVLABS_PSW
 let jiraAsopUrl = process.env.JIRA_ASOP_URL
+let devLabJql = process.DEVLABS_JQL
 
 if (process.env.NODE_ENV === 'test') {
   port = process.env.TEST_PORT
@@ -24,6 +25,7 @@ if (process.env.NODE_ENV === 'test') {
   jiraDevLabsUrl = process.env.TEST_JIRA_DEVLABS_URL
   jiraDevLabsPsw = process.env.TEST_JIRA_DEVLABS_PSW
   jiraAsopUrl = process.env.TEST_JIRA_ASOP_URL
+  devLabJql = process.TEST_DEVLABS_JQL
 }
 
 const log = (file, text) => {

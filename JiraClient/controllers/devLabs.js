@@ -9,7 +9,39 @@ const JiraClient = require('jira-connector')
 
 
 devlabsRouter.get('/:id', async (request, response) => {
-    console.log('devlabs withID');
+
+  //validCall = utils.isValidCall(request)
+  //if (validCall.statuscode !== 200) {
+  //  response.status(validCall.statuscode).json(validCall.status)
+  //  return
+  //}
+
+  const jira = new JiraClient( {
+    protocol: 'https',
+    strictSSL: false,
+    host: config.jiraDevLabsUrl,
+    port: '8443',
+    apiVersion: '2',
+    basic_auth: {
+        username: config.jiraDevLabsUser.trim(),
+        password: config.jiraDevLabsPsw.trim()
+    }
+  })
+  const issue = await jira.issue.getChangelog({
+    issueKey: request.params.id
+  }, function(error, issue) {
+    console.log('error in changeLog function', error);
+    console.log('changeLog function', issue);
+  })
+  //console.log('issue in changeLog', issue);
+  response.json({issue: issue})
+
+})
+
+devlabsRouter.get('/', async (request, response) => {
+
+    //
+    console.log('devlabs without id');
     //validCall = utils.isValidCall(request)
     //if (validCall.statuscode !== 200) {
     //  response.status(validCall.statuscode).json(validCall.status)
@@ -28,14 +60,14 @@ devlabsRouter.get('/:id', async (request, response) => {
           password: config.jiraDevLabsPsw.trim()
       }
     })
-    console.log('JiraClient:', jira)
+    //console.log('JiraClient:', jira)
 
     const issue = await jira.search.search({
       jql: jql_string,
-      maxResults: 3654
+      maxResults: 100
       },
       function(error, issue) {
-      console.log('error issue', error, issue);
+        //console.log('error issue', error, issue);
       response.json({issue: issue})
     })
 
@@ -46,30 +78,6 @@ devlabsRouter.get('/:id', async (request, response) => {
     //  console.log('error issue', error, issue);
     //  response.json({issue: issue})
     //})
-
-})
-
-devlabsRouter.get('/', async (request, response) => {
-    console.log('noID');
-    validCall = utils.isValidCall(request)
-    if (validCall.statuscode !== 200) {
-      response.status(validCall.statuscode).json(validCall.status)
-      return
-    }
-    const jira = new JiraClient( {
-      host: config.jiraURL,
-      basic_auth: {
-          base64: utils.createJiraToken()
-      }
-    })
-    const issue = jira.issue.getIssue({
-      issueKey: 'LC-1'
-    }, function(error, issue) {
-      //console.log('error', error);
-      //console.log(issue);
-    })
-    //console.log('issue', issue);
-    response.json({issue: issue})
 })
 
 devlabsRouter.post('/', async (request, response) => {

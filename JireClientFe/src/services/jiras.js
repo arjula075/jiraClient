@@ -27,11 +27,42 @@ const getIssue = async(token, id) => {
 
 }
 
+const getAllDevLabsIssues = async(token) => {
+  const authString = utils.makeAuthString(token)
+  const head =  {'headers' :{'Authorization': authString}}
+
+  console.log(baseUrlDevLabs,  head)
+  try {
+    const request = axios.get(baseUrlDevLabs + '/', head)
+    return request.then(response => response.data)
+  }
+  catch(error) {
+    console.log(error)
+  }
+
+}
+
+const getDevLabsIssueChangeLog = async(token, id) => {
+  const authString = utils.makeAuthString(token)
+  const head =  {'headers' :{'Authorization': authString}}
+
+  console.log(baseUrlDevLabs,  head)
+  try {
+    const request = axios.get(baseUrlDevLabs + `/${id}`, head)
+    return request.then(response => response.data)
+  }
+  catch(error) {
+    console.log(error)
+  }
+
+}
+
+
 const getDevLabsIssue = async(token, id) => {
   const authString = utils.makeAuthString(token)
   const head =  {'headers' :{'Authorization': authString}}
 
-  console.log(baseUrlDevLabs, id,  head)
+  console.log(baseUrlDevLabs,  head)
   try {
     const request = axios.get(baseUrlDevLabs + `/${id}`, head)
     return request.then(response => response.data)
@@ -74,5 +105,7 @@ export default {
   getIssue,
   postIssue,
   getDevLabsIssue,
-  getAsopIssue
+  getAsopIssue,
+  getAllDevLabsIssues,
+  getDevLabsIssueChangeLog
 }
