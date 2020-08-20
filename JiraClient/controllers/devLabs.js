@@ -6,6 +6,7 @@ const utils = require('../utils/utils')
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
 const JiraClient = require('jira-connector')
+const fs = require('fs');
 
 
 devlabsRouter.get('/:id', async (request, response) => {
@@ -20,21 +21,47 @@ devlabsRouter.get('/:id', async (request, response) => {
     protocol: 'https',
     strictSSL: false,
     host: config.jiraDevLabsUrl,
-    port: '8443',
+    //port: '8443',
     apiVersion: '2',
     basic_auth: {
-        username: config.jiraDevLabsUser.trim(),
-        password: config.jiraDevLabsPsw.trim()
+        email: config.jiraDevLabsUser.trim(),
+        api_token: config.jiraToken.trim()
     }
   })
-  const issue = await jira.issue.getChangelog({
-    issueKey: request.params.id
-  }, function(error, issue) {
-    console.log('error in changeLog function', error);
-    console.log('changeLog function', issue);
+
+const issue = await jira.issue.getChangelog({ issueKey: request.params.id });
+
+//console.log('issue in changeLog', issue);
+
+response.json({issue: issue})
+
+})
+
+devlabsRouter.get('/sprint/:id', async (request, response) => {
+
+  //validCall = utils.isValidCall(request)
+  //if (validCall.statuscode !== 200) {
+  //  response.status(validCall.statuscode).json(validCall.status)
+  //  return
+  //}
+  //console.log('sprint id');
+  const jira = new JiraClient( {
+    protocol: 'https',
+    strictSSL: false,
+    host: config.jiraDevLabsUrl,
+    //port: '8443',
+    apiVersion: '2',
+    basic_auth: {
+        email: config.jiraDevLabsUser.trim(),
+        api_token: config.jiraToken.trim()
+    }
   })
-  //console.log('issue in changeLog', issue);
-  response.json({issue: issue})
+  const issue = jira.sprint
+  .getSprint({sprintId: request.params.id})
+  .then(issue => {
+    response.json({issue: issue})
+  })
+  .catch(error => {throw error});
 
 })
 
@@ -48,28 +75,23 @@ devlabsRouter.get('/', async (request, response) => {
     //  return
     //}
 
-    let jql_string = 'project = HRTS AND fixVersion !~ "Kieku*" ORDER BY lastViewed DESC'
+    let jql_string = 'issuetype in (Story, Task) AND project = CPS AND component not in ("FI Development", "Cloud Infra") AND Sprint in (openSprints())'
     const jira = new JiraClient( {
       protocol: 'https',
       strictSSL: false,
       host: config.jiraDevLabsUrl,
-      port: '8443',
+      //port: '8443',
       apiVersion: '2',
       basic_auth: {
-          username: config.jiraDevLabsUser.trim(),
-          password: config.jiraDevLabsPsw.trim()
+        email: config.jiraDevLabsUser.trim(),
+        api_token: config.jiraToken.trim()
       }
     })
     //console.log('JiraClient:', jira)
 
-    const issue = await jira.search.search({
-      jql: jql_string,
-      maxResults: 100
-      },
-      function(error, issue) {
-        //console.log('error issue', error, issue);
-      response.json({issue: issue})
-    })
+    const issue = await jira.search.search({ jql: jql_string });
+
+    response.json({issue: issue})
 
     //const issue = await jira.issue.getIssue({
     //  issueKey: request.params.id
@@ -80,6 +102,26 @@ devlabsRouter.get('/', async (request, response) => {
     //})
 })
 
+
+
+devlabsRouter.post('/write2file', async (request, response) => {
+  // validating own call
+  validCall = utils.isValidCall(request)
+  if (validCall.statuscode !== 200) {
+    response.status(validCall.statuscode).json(validCall.status)
+    console.log('not valid call');
+    return
+  }
+
+  console.log('data in w2f', request.body);
+  fs.appendFile('message.txt', request.body.string + '\r\n', function (err) {
+    if (err) throw err;
+    console.log('Saved!');
+  });
+  response.status(200).json("ok")
+
+})
+
 devlabsRouter.post('/', async (request, response) => {
   // validating own call
   validCall = utils.isValidCall(request)
@@ -88,11 +130,13 @@ devlabsRouter.post('/', async (request, response) => {
     console.log('not valid call');
     return
   }
-  // trying with direct call
-  const result = await jiraCreateCalls(request.body)
-  //const result = await jiraDeleteAll(request.body)
-  //const result = await jiraGetIssue(request.body)
-  response.status(200).json(result)
+
+    // trying with direct call
+    const result = await jiraCreateCalls(request.body)
+    //const result = await jiraDeleteAll(request.body)
+    //const result = await jiraGetIssue(request.body)
+    response.status(200).json(result)
+
 })
 
 const jiraDeleteAll = async(array) => {

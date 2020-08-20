@@ -6,8 +6,8 @@ import loginService from './services/login'
 import JiraComponent from './components/jiraClient'
 import UserComponent from './components/user'
 import DevLabsComponent from './components/devlabs'
-import AsopComponent from './components/asop'
 import IssueComponent from './components/issue'
+import AddedIssuesComponent from './components/addedissue'
 import jiraService from './services/jiras'
 const utils = require('./utils/utils.js')
 
@@ -29,6 +29,8 @@ class App extends React.Component {
           issues: null,
           fetchedPassword: cachedUser ? cachedUser.password : null,
           issues: null,
+          addedIssues: null,
+          addedPivotIssues: null,
         }
       this.handleLoginResult = this.handleLoginResult.bind(this)
       this.setNotification = this.setNotification.bind(this)
@@ -36,16 +38,43 @@ class App extends React.Component {
       this.loginFromCache = this.loginFromCache.bind(this)
       this.toggleVisibility = this.toggleVisibility.bind(this)
       this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
-      this.dataButtonClicked = this.dataButtonClicked.bind(this)
       this.devlabsButtonClicked = this.devlabsButtonClicked.bind(this)
-      this.asopButtonClicked = this.asopButtonClicked.bind(this)
       this.getChangeLog = this.getChangeLog.bind(this)
+      this.getActiveSprint = this.getActiveSprint.bind(this)
+      this.addedStoriesButtonClicked = this.addedStoriesButtonClicked.bind(this)
+      this.toggleAddedVisibility = this.toggleAddedVisibility.bind(this)
+      this.saveAddedStoriesButtonClicked = this.saveAddedStoriesButtonClicked.bind(this)
     }
     catch (e) {
       console.log(e);
     }
 
   }
+
+saveAddedStoriesButtonClicked = async(evt, myFile, token) => {
+
+  try {
+    evt.preventDefault()
+    this.state.addedIssues.map(item => {
+    console.log('added issue', item)
+    let strResult = ""
+    strResult = strResult.concat(item.key)
+    if (item.fields.labels.length > 0) {
+      item.fields.labels.map(label => {
+        strResult.concat("; ")
+        strResult.concat(item.key)
+      })
+    }
+    console.log('str', strResult);
+    const payLoad = {string: strResult}
+    jiraService.writeToFile(this.state.token, payLoad)
+  })
+}
+catch (err) {
+  console.log(err)
+}
+
+}
 
 jiraButtonClicked = async(evt, myFile, token) => {
     console.log('in jbc token', token);
@@ -84,40 +113,123 @@ jiraButtonClicked = async(evt, myFile, token) => {
       const issue = await jiraService.getAllDevLabsIssues(this.state.token)
       this.setState({issues: issue.issue.issues})
 
+    }
+
+  addedStoriesButtonClicked = async(evt, myFile, token) => {
+      evt.preventDefault()
       // get change history
+      // first, get first items changes and we should get the latest sprint from there
+      let sprints = await this.getActiveSprint(this.state.issues[0].key)
+      console.log('sprints', sprints)
+      // when we have sprint, we can get the sprint details
+      const oneSprint = await jiraService.getSprintDetails(this.state.token, sprints[0].sprint)
+
+
+      // when we have sprint details, we can then check from that sprint if the stories have been added after startDate
+      this.state.addedIssues = []
+
+      console.log('added issues should be empty', this.state.addedIssues)
       this.state.issues.map(issue => {
-          this.getChangeLog(issue.key)
-        })
+        const isAddedLater = this.getAddedStoriesToSprint(issue, oneSprint)
+      })
+      //console.log('added issues', this.state.addedIssues)
+      const adIs = this.state.addedIssues
+      console.log('added issues adis', adIs)
+
+
+      this.setState({addedPivotIssues: adIs})
+
+    }
+
+    getAddedStoriesToSprint = async(issue, oneSprint) => {
+      //console.log('oneSprint', oneSprint)
+      const changeLog = await jiraService.getDevLabsIssueChangeLog(this.state.token, issue.key)
+
+      changeLog.issue.values.map(item => {
+          item.items.map(change => {
+            //console.log('change.field', change.field)
+            //console.log('change.to', change.to)
+            //console.log('item.created', item.created )
+            //console.log('oneSprint.startDate', oneSprint.startDate)
+            if (change.field === 'Sprint') {
+              try {
+                if (parseInt(change.to) === oneSprint.issue.id) {
+                  if (item.created > oneSprint.issue.startDate) {
+                    this.state.addedIssues.push(issue)
+                    return true
+                  }
+                }
+              }
+              catch (e) {
+                console.log('not number')
+              }
+
+            }
+            //console.log('same sprint', (change.field === 'Sprint' && change.to === oneSprint.issue.id))
+            //if (change.field === 'Sprint' && change.to === oneSprint.issue.id) {
+              //if (item.created > oneSprint.startDate) {
+                //console.log('return true')
+                //return true
+      })
+    })
+      return false
 
     }
 
     getChangeLog = async(id) => {
-      let changeLog = await jiraService.getDevLabsIssueChangeLog(this.state.token, id)
-      console.log(changeLog);
+      const changeLog = await jiraService.getDevLabsIssueChangeLog(this.state.token, id)
+      return changeLog
 
     }
 
-    asopButtonClicked = async(evt, myFile, token) => {
-        evt.preventDefault()
+    getActiveSprint = async(id) => {
+      let sprints = []
+      console.log('changeLog id', id)
+      let changeLog = await this.getChangeLog(id)
+      console.log('changeLog', changeLog)
+      changeLog.issue.values.map(change => {
+        change.items.map(item => {
+            if (item.field == 'Sprint') {
+              const sprintDetails = new Object()
+              sprintDetails.sprint = item.to
+              sprintDetails.sprintString = item.toString
+              sprints.push(sprintDetails)
 
-        //await jiraService.authenticate(this.state.token)
-        const issue = await jiraService.getAsopIssue(this.state.token, 'IPSLACE-2')
-        console.log('issue', issue);
+            }
+          })
+        })
+
+        sprints.sort(utils.compareSprints)
+        console.log('sprints', sprints)
+        return sprints
+      //console.log("changeLog values", changeLog.issue.values);
+
+    }
+
+    toggleAddedVisibility = (id) => {
+      // first for issues
+
+      // then for added
+      let pivotIssues = this.state.addedIssues
+      const index = pivotIssues.findIndex(blog => blog.id == id)
+      if (index > -1) {
+        if (typeof pivotIssues[index].visibility == 'undefined') {
+          pivotIssues[index].visibility = false
+        }
+        pivotIssues[index].visibility =  !pivotIssues[index].visibility
       }
+      this.setState({
+        addedIssues: pivotIssues,
+      })
 
-  dataButtonClicked = async(evt, myFile, token) => {
-      console.log('in jbc token', token);
-      console.log('in jbc token', this.state.token);
-      evt.preventDefault()
 
-      //await jiraService.authenticate(this.state.token)
-      const issue = await jiraService.getIssue(this.state.token, 'LC-8')
-      console.log('issue', issue);
     }
 
   toggleVisibility = (id) => {
-    console.log('id is vis', id)
-    const pivotIssues = this.state.issues
+    // first for issues
+
+    // then for added
+    let pivotIssues = this.state.issues
     const index = pivotIssues.findIndex(blog => blog.id == id)
     if (index > -1) {
       if (typeof pivotIssues[index].visibility == 'undefined') {
@@ -126,8 +238,10 @@ jiraButtonClicked = async(evt, myFile, token) => {
       pivotIssues[index].visibility =  !pivotIssues[index].visibility
     }
     this.setState({
-      issues: pivotIssues
+      issues: pivotIssues,
     })
+
+
   }
 
   componentDidMount = async() => {
@@ -230,14 +344,16 @@ jiraButtonClicked = async(evt, myFile, token) => {
           <UserComponent user={this.state.user} />
         </div>
         <div style={this.state.showWhenLoggedIn}>
-            <JiraComponent jiraButtonClicked={this.jiraButtonClicked} dataButtonClicked={this.dataButtonClicked} devlabsButtonClicked={this.devlabsButtonClicked}/>
+            <JiraComponent jiraButtonClicked={this.jiraButtonClicked} dataButtonClicked={this.dataButtonClicked} devlabsButtonClicked={this.devlabsButtonClicked} addedStoriesButtonClicked={this.addedStoriesButtonClicked} saveAddedStoriesButtonClicked = {this.saveAddedStoriesButtonClicked} />
         </div>
         <div style={this.state.hideWhenLoggedIn}>
           <DevLabsComponent devlabsButtonClicked={this.devlabsButtonClicked}/>
         </div >
-        <div style={this.state.hideWhenLoggedIn}>
-          <AsopComponent asopButtonClicked={this.asopButtonClicked}/>
+        <div><hr /> ADDED ISSUES</div>
+        <div style={this.state.showWhenLoggedIn}>
+          <AddedIssuesComponent addedIssues={this.state.addedPivotIssues} toggleAddedVisibility={this.toggleAddedVisibility}/>
         </div >
+        <div><hr />SPRINT ISSUES</div>
         <div style={this.state.showWhenLoggedIn}>
           <IssueComponent issues={this.state.issues} toggleVisibility={this.toggleVisibility}/>
         </div >

@@ -1,3 +1,5 @@
+
+
 const getUserFromMemory = () => {
   const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
   if (loggedUserJSON) {
@@ -97,6 +99,17 @@ const makeAuthHeader = (token) => {
   return authString
 }
 
+const compareSprints = (b, a) => {
+
+  let comparison = 0;
+  if (a.sprint > b.sprint) {
+    comparison = 1;
+  } else if (a.sprint < b.sprint) {
+    comparison = -1;
+  }
+  return comparison;
+}
+
 module.exports = {
   getUserFromMemory,
   logOut,
@@ -106,5 +119,6 @@ module.exports = {
   makeAuthString,
   makeAuthHeader,
   lineToIssue,
-  createIssueArray
+  createIssueArray,
+  compareSprints,
 }

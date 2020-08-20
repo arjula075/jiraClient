@@ -10,7 +10,6 @@ const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const jiraRouter = require('./controllers/jira')
 const devlabsRouter = require('./controllers/devLabs')
-const asopRouter = require('./controllers/asop')
 const middleware = require('./utils/middleware')
 
 
@@ -24,7 +23,6 @@ app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/jira', jiraRouter)
 app.use('/api/devlabs', devlabsRouter)
-app.use('/api/asop', asopRouter)
 app.use(middleware.logger)
 
 

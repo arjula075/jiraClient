@@ -1,14 +1,13 @@
 import React from 'react'
-import Togglable from '../components/toggable'
+import AddedTogglable from '../components/addedtoggable'
 import SimpleIssue from '../components/simpleIssue'
 
 
-const IssueComponent = (props) =>  {
+const AddedIssuesComponent = (props) =>  {
 
-    const issues = props.issues
+    //console.log('AddedIssuesComponent func', props)
+    const addedIssues = props.addedIssues
     const label = 'Näytä tiedot'
-    console.log('props in issuecomp', props)
-
     const blogStyle = () => {
       return {
         paddingTop: 10,
@@ -28,17 +27,17 @@ const IssueComponent = (props) =>  {
       props.toggleVisibility(props1.issue.id)
     }
 
-    if (issues) {
+    if (addedIssues) {
+      console.log('should be something to return', addedIssues)
       return (
-        issues.map(issue => {
-
+        addedIssues.map(issue => {
           return (
             <div key={issue.id} style={blogStyle()} className='blogContainer'>
-              <Togglable issue={issue} toggleVisibility={props.toggleVisibility}  buttonLabel ={issue.fields.summary} user = {issue.key} caller = 'normal'>
+              <AddedTogglable issue={issue} toggleAddedVisibility={props.toggleAddedVisibility}  buttonLabel ={issue.fields.summary} user = {issue.key} caller = 'addedIssues'>
                 <p>{issue.fields.creator.name}</p>
                 <p>{issue.fields.summary}</p>
                 <SimpleIssue issue={issue} onClick={onClick}/>
-            </Togglable>
+              </AddedTogglable>
           </div>
           )
           })
@@ -46,9 +45,9 @@ const IssueComponent = (props) =>  {
       }
     else {
         return (
-          <div></div>
+          <div>no added issues</div>
           )
     }
 }
 
-export default IssueComponent
+export default AddedIssuesComponent

@@ -10,12 +10,14 @@ constructor(props) {
   }
   this.jiraButtonClicked = props.jiraButtonClicked
   this.jiraButtonClicked = this.jiraButtonClicked.bind(this)
-  this.dataButtonClicked = props.dataButtonClicked
-  this.dataButtonClicked = this.dataButtonClicked.bind(this)
   this.devlabsButtonClicked = props.devlabsButtonClicked
   this.devlabsButtonClicked = this.devlabsButtonClicked.bind(this)
+  this.saveAddedStoriesButtonClicked = props.saveAddedStoriesButtonClicked
+  this.saveAddedStoriesButtonClicked = this.saveAddedStoriesButtonClicked.bind(this)
   this.buttonClicked = this.buttonClicked.bind(this)
   this.handleFileFieldChange = this.handleFileFieldChange.bind(this)
+  this.addedStoriesButtonClicked = props.addedStoriesButtonClicked
+  this.addedStoriesButtonClicked = this.addedStoriesButtonClicked.bind(this)
 }
 
 handleFileFieldChange = (e) => {
@@ -44,10 +46,13 @@ render() {
           <button type='submit' onClick={this.buttonClicked}>UPLOAD FILE</button>
         </div>
         <div>
-          <button type='submit' onClick={this.dataButtonClicked}>GET DATA</button>
+          <button type='submit' onClick={this.devlabsButtonClicked}>GET SPRINT DATA</button>
         </div>
         <div>
-          <button type='submit' onClick={this.devlabsButtonClicked}>GET DEVLABS DATA</button>
+          <button type='submit' onClick={this.addedStoriesButtonClicked}>GET ADDED STORIES</button>
+        </div>
+        <div>
+          <button type='submit' onClick={this.saveAddedStoriesButtonClicked}>SAVE ADDED STORIES</button>
         </div>
 
       </form>

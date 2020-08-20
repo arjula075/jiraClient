@@ -23,7 +23,7 @@ render() {
     <div>
       <form>
         <div>
-          <button type='submit' onClick={this.devlabsButtonClicked}>GET DEVLABS DATA</button>
+          <button type='submit' onClick={this.devlabsButtonClicked}>GET SPRINT DATA</button>
         </div>
       </form>
     </div>

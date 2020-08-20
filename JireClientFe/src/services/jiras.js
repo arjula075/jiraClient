@@ -31,9 +31,27 @@ const getAllDevLabsIssues = async(token) => {
   const authString = utils.makeAuthString(token)
   const head =  {'headers' :{'Authorization': authString}}
 
-  console.log(baseUrlDevLabs,  head)
+  //console.log(baseUrlDevLabs,  head)
   try {
     const request = axios.get(baseUrlDevLabs + '/', head)
+    return request.then(response => response.data)
+  }
+  catch(error) {
+    console.log(error)
+  }
+
+}
+
+const getSprintDetails = async(token, id) => {
+
+  console.log('token', token)
+  console.log('id', id)
+  const authString = utils.makeAuthString(token)
+  const head =  {'headers' :{'Authorization': authString}}
+
+  //console.log(baseUrlDevLabs,  head)
+  try {
+    const request = axios.get(baseUrlDevLabs + '/sprint' +  `/${id}`, head)
     return request.then(response => response.data)
   }
   catch(error) {
@@ -46,9 +64,9 @@ const getDevLabsIssueChangeLog = async(token, id) => {
   const authString = utils.makeAuthString(token)
   const head =  {'headers' :{'Authorization': authString}}
 
-  console.log(baseUrlDevLabs,  head)
+  //console.log(baseUrlDevLabs,  head)
   try {
-    const request = axios.get(baseUrlDevLabs + `/${id}`, head)
+    const request = axios.get(baseUrlDevLabs +  `/${id}`, head)
     return request.then(response => response.data)
   }
   catch(error) {
@@ -62,7 +80,7 @@ const getDevLabsIssue = async(token, id) => {
   const authString = utils.makeAuthString(token)
   const head =  {'headers' :{'Authorization': authString}}
 
-  console.log(baseUrlDevLabs,  head)
+  //console.log(baseUrlDevLabs,  head)
   try {
     const request = axios.get(baseUrlDevLabs + `/${id}`, head)
     return request.then(response => response.data)
@@ -98,6 +116,17 @@ const postIssue = async(token, issue) => {
 
 }
 
+const writeToFile = async(token, issue) => {
+  console.log('issue in caller', issue)
+  const authString = utils.makeAuthString(token)
+  const head =  {'headers' :{'Authorization': authString}}
+
+
+  const request = axios.post(baseUrlDevLabs + '/write2file', issue,  head)
+  return request.then(response => response.data)
+
+}
+
 
 
 export default {
@@ -107,5 +136,7 @@ export default {
   getDevLabsIssue,
   getAsopIssue,
   getAllDevLabsIssues,
-  getDevLabsIssueChangeLog
+  getDevLabsIssueChangeLog,
+  getSprintDetails,
+  writeToFile
 }
