@@ -37,7 +37,7 @@
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
     "jira-connector": "^3.1.0",
-    "jsonwebtoken": "^8.3.0",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^5.8.7",
     "morgan": "^1.9.1",
     "npm": "^6.14.8"
